@@ -16,8 +16,18 @@ from backend.texture_tool.lighting import correct_lighting
 from backend.texture_tool.pbr import generate_maps
 
 
+# Global AI Engine Initialization (Saves 10s per request)
+REMBG_SESSION = None
+try:
+    from rembg import new_session
+    # Lite model is ~4MB, very fast to load
+    REMBG_SESSION = new_session("u2netp")
+    print("✅ AI Engine [Lite] initialized and ready.")
+except Exception as e:
+    print(f"⚠️ AI Engine warning: {e}")
+
 app = Flask(__name__)
-CORS(app) # This handles all origins and preflights automatically
+CORS(app) 
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 # 50 MB max size for large base64 arrays
@@ -190,20 +200,8 @@ def generate_spritesheet():
     start_time = time.time()
     decode_start = time.time() # Initialize early to avoid NameError
     
-    # Pre-load rembg session (Lite model for memory safety)
-    rembg_session = None
-    if remove_bg:
-        try:
-            from rembg import remove, new_session
-            print("Initializing rembg engine...")
-            rembg_session = new_session("u2netp")
-        except Exception as e:
-            print(f"rembg init error: {e}")
-            remove_bg = False
-
-    try:
-        print(f"[{time.time() - start_time:.2f}s] AI Model Ready. Processing {len(base64_frames)} frames.")
-    except: pass
+    # Use Global AI Session (Pre-loaded for speed)
+    rembg_session = REMBG_SESSION if remove_bg else None
     
     cv_frames = []
     for i, b64 in enumerate(base64_frames):
@@ -457,16 +455,12 @@ def remove_bg_single():
     b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
     
     try:
-        from rembg import remove, new_session
-        session = new_session()
-        
+        from rembg import remove
         img_bytes = base64.b64decode(b64_data)
-        out_bytes = remove(img_bytes, session=session)
+        # Use Global AI session!
+        out_bytes = remove(img_bytes, session=REMBG_SESSION)
         
-        # We need to turn this back to base64
-        # out_bytes is already a PNG byte array from rembg
         out_b64 = f"data:image/png;base64,{base64.b64encode(out_bytes).decode('utf-8')}"
-        
         return jsonify({"image": out_b64})
     except Exception as e:
         print(f"rembg error: {e}")
