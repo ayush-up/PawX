@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabFrames = document.getElementById('tabFrames');
     const tabResult = document.getElementById('tabResult');
     const downloadBtn = document.getElementById('downloadBtn');
+    const aiRemoveBgBtn = document.getElementById('aiRemoveBgBtn');
 
     let videoFile = null;
     let extractedFramesBase64 = []; // Store original base64 images
@@ -267,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     frames: selectedFrames,
                     grid_layout: gridLayout,
-                    remove_bg: aiBgRemoval
+                    remove_bg: false
                 })
             });
 
@@ -278,13 +279,37 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show result
             frameGallery.style.display = 'none';
             previewImage.style.display = 'block';
-            downloadBtn.style.display = 'block'; // Show download button
+            aiRemoveBgBtn.style.display = 'block';
+            downloadBtn.style.display = 'block'; 
             previewImage.src = data.spritesheet;
             
+            // AI Action
+            aiRemoveBgBtn.onclick = async () => {
+                aiRemoveBgBtn.innerText = "⏳ REMOVING...";
+                aiRemoveBgBtn.disabled = true;
+                try {
+                    const aiRes = await fetch(`${API_URL}/remove-bg-single`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: previewImage.src })
+                    });
+                    const aiData = await aiRes.json();
+                    if (aiData.image) {
+                        previewImage.src = aiData.image;
+                        aiRemoveBgBtn.style.display = 'none'; // Done
+                    }
+                } catch (err) {
+                    alert("AI Error: " + err.message);
+                } finally {
+                    aiRemoveBgBtn.innerText = "✨ AI REMOVE BACKGROUND";
+                    aiRemoveBgBtn.disabled = false;
+                }
+            };
+
             // Download logic
             downloadBtn.onclick = () => {
                 const link = document.createElement("a");
-                link.href = data.spritesheet;
+                link.href = previewImage.src;
                 link.download = "spritesheet.png";
                 link.click();
             };

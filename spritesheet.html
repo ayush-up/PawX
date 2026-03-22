@@ -62,8 +62,7 @@
                         <option value="row">Single Row</option>
                     </select>
 
-                    <h4>ENHANCEMENTS</h4>
-                    <label><input type="checkbox" id="aiBgRemoval"> AI Background Removal</label>
+                    <!-- AI removal moved to post-generation for better reliability -->
 
                     <button type="button" class="process-btn" id="generateBtn" style="margin-top: 15px;" disabled>▶ GENERATE SPRITESHEET</button>
                     <button type="button" id="downloadFramesBtn" style="width: 100%; padding: 12px; margin-top: 10px; background: transparent; color: #ff6a00; border: 2px solid #ff6a00; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase;" disabled>⬇ DOWNLOAD FRAMES (ZIP)</button>
@@ -89,7 +88,8 @@
                     <!-- Final Spritesheet Result -->
                     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
                         <img id="previewImage" style="display: none; max-width: 100%; border-radius: 6px; border: 1px solid #555;">
-                        <button type="button" id="downloadBtn" style="display: none; background-color: #ff9e2c; color: #000; border: none; margin-top: 15px; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; cursor: pointer; border-radius: 4px; transition: 0.2s;">⬇ DOWNLOAD SPRITESHEET</button>
+                        <button type="button" id="aiRemoveBgBtn" style="display: none; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #fff; border: none; margin-top: 15px; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; cursor: pointer; border-radius: 4px; transition: 0.2s;">✨ AI REMOVE BACKGROUND</button>
+                        <button type="button" id="downloadBtn" style="display: none; background-color: #ff9e2c; color: #000; border: none; margin-top: 10px; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; cursor: pointer; border-radius: 4px; transition: 0.2s;">⬇ DOWNLOAD SPRITESHEET</button>
                     </div>
                 </div>
             </div>
