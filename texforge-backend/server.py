@@ -199,6 +199,9 @@ def generate_spritesheet():
 
     print(f"[{time.time() - start_time:.2f}s] AI Model Ready. Processing {len(base64_frames)} frames.")
     decode_start = time.time()
+
+    cv_frames = []
+    for i, b64 in enumerate(base64_frames):
         b64_data = b64.split(',')[-1]
         b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
         
