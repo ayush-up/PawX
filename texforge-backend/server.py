@@ -185,52 +185,38 @@ def generate_spritesheet():
 
     start_time = time.time()
     
-    # Pre-load rembg session if needed to prevent massive memory leaks
-    rembg_session = None
-    if remove_bg:
-        try:
-            from rembg import new_session
-            rembg_session = new_session()
-        except ImportError:
-            print("rembg is not installed. Background removal skipped.")
-            remove_bg = False
+    # Pre-load rembg session (Lite model for memory safety)
+    try:
+        from rembg import remove, new_session
+        # u2netp is ~4MB, u2net is ~170MB. Use lite on Render Free.
+        rembg_session = new_session("u2netp") if remove_bg else None
+    except Exception as e:
+        print(f"rembg init error: {e}")
+        remove_bg = False
+        rembg_session = None
 
-    print(f"[{time.time() - start_time:.2f}s] Initialization complete. Processing {len(base64_frames)} frames. bg_removal={remove_bg}")
-    decode_start = time.time()
-
-    # Decode bas64 frames back to OpenCV images
     cv_frames = []
     for i, b64 in enumerate(base64_frames):
-        # split "data:image/jpeg;base64,....."
         b64_data = b64.split(',')[-1]
-        # Add missing padding if necessary to avoid binascii.Error: Incorrect padding
         b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
         
         try:
             img_bytes = base64.b64decode(b64_data)
+            if remove_bg and rembg_session:
+                img_bytes = remove(img_bytes, session=rembg_session)
+            
+            np_arr = np.frombuffer(img_bytes, np.uint8)
+            img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+            if img is not None:
+                # Standardize to BGRA (4 channels)
+                if len(img.shape) == 2: img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGRA)
+                elif img.shape[2] == 3: img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+                cv_frames.append(img)
         except Exception as e:
-            print(f"Base64 padding/decoding error: {e}")
+            print(f"Frame {i} error: {e}")
             continue
 
-        if remove_bg and rembg_session is not None:
-            try:
-                from rembg import remove
-                img_bytes = remove(img_bytes, session=rembg_session)
-            except Exception as e:
-                print(f"rembg processing error: {e}")
-
-        np_arr = np.frombuffer(img_bytes, np.uint8)
-        img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
-        
-        if img is not None:
-            # Ensure 4 channels (BGRA) for transparency support
-            if len(img.shape) == 2: # Grayscale
-                img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGRA)
-            elif img.shape[2] == 3: # BGR
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-            cv_frames.append(img)
-            
-    print(f"[{time.time() - decode_start:.2f}s] Frame decoding & AI processing complete.")
+    print(f"[{time.time() - decode_start:.2f}s] Processing complete. Frames: {len(cv_frames)}")
     stitch_start = time.time()
     
     if not cv_frames:
