@@ -186,17 +186,19 @@ def generate_spritesheet():
     start_time = time.time()
     
     # Pre-load rembg session (Lite model for memory safety)
-    try:
-        from rembg import remove, new_session
-        # u2netp is ~4MB, u2net is ~170MB. Use lite on Render Free.
-        rembg_session = new_session("u2netp") if remove_bg else None
-    except Exception as e:
-        print(f"rembg init error: {e}")
-        remove_bg = False
-        rembg_session = None
+    rembg_session = None
+    if remove_bg:
+        try:
+            from rembg import remove, new_session
+            # Optimization: Pre-importing helps with first-request timeouts
+            print("Initializing rembg (u2netp)...")
+            rembg_session = new_session("u2netp")
+        except Exception as e:
+            print(f"rembg init error: {e}")
+            remove_bg = False
 
-    cv_frames = []
-    for i, b64 in enumerate(base64_frames):
+    print(f"[{time.time() - start_time:.2f}s] AI Model Ready. Processing {len(base64_frames)} frames.")
+    decode_start = time.time()
         b64_data = b64.split(',')[-1]
         b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
         
