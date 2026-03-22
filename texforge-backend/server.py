@@ -3,12 +3,15 @@ import time
 import base64
 import numpy as np
 import cv2
+import gc
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
-# Numba Stability Fixes for experimental Python environments
+# Numba & Resource Stability for Render Free Tier (0.1 CPU, 512MB RAM)
 os.environ['NUMBA_CACHE_DIR'] = '/tmp/numba_cache'
 os.environ['NUMBA_PARALLEL_DIAGNOSTICS'] = '0'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
 
 # Import backend logic
 from backend.texture_tool.advanced_seamless import make_seamless
@@ -20,9 +23,9 @@ from backend.texture_tool.pbr import generate_maps
 REMBG_SESSION = None
 try:
     from rembg import new_session
-    # Lite model is ~4MB, very fast to load
+    # Lite model [u2netp] is optimized for CPU-only small-RAM servers
     REMBG_SESSION = new_session("u2netp")
-    print("✅ AI Engine [Lite] initialized and ready.")
+    print("✅ AI Engine [Lite + Thread-Limited] initialized and ready.")
 except Exception as e:
     print(f"⚠️ AI Engine warning: {e}")
 
@@ -206,20 +209,45 @@ def generate_spritesheet():
     cv_frames = []
     for i, b64 in enumerate(base64_frames):
         try:
+            # 1. Decode
             b64_data = b64.split(',')[-1]
             b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
             img_bytes = base64.b64decode(b64_data)
             
-            if remove_bg and rembg_session:
-                from rembg import remove as rembg_inner_remove
-                img_bytes = rembg_inner_remove(img_bytes, session=rembg_session)
-            
+            # 2. Pre-process (Resize for AI Speed and RAM safety)
             np_arr = np.frombuffer(img_bytes, np.uint8)
             img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+            if img is None: continue
+
+            # Scale down for AI pass (Max 512px) - This makes it 10x faster
+            h, w = img.shape[:2]
+            max_dim = 512
+            if max(h, w) > max_dim:
+                scale = max_dim / max(h, w)
+                img = cv2.resize(img, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+
+            # 3. AI Pass
+            if remove_bg and REMBG_SESSION:
+                # Convert back to bytes for rembg
+                _, buffer = cv2.imencode('.png', img)
+                img_bytes = buffer.tobytes()
+                
+                from rembg import remove as rembg_inner_remove
+                img_bytes = rembg_inner_remove(img_bytes, session=REMBG_SESSION)
+                
+                # Re-decode to CV2
+                np_arr = np.frombuffer(img_bytes, np.uint8)
+                img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+
             if img is not None:
                 if len(img.shape) == 2: img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGRA)
                 elif img.shape[2] == 3: img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
                 cv_frames.append(img)
+            
+            # Explicit Cleanup
+            import gc
+            gc.collect()
+
         except Exception as e:
             print(f"Frame {i} error: {e}")
             continue
