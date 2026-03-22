@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('remove_bg', aiBgRemoval);
 
         try {
-            const response = await fetch(`${API_URL}/generate_masks`, {
+            const response = await fetch(`${API_URL}/extract-sprites-points`, {
                 method: 'POST',
                 body: formData
             });
