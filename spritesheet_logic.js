@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabFrames = document.getElementById('tabFrames');
     const tabResult = document.getElementById('tabResult');
     const downloadBtn = document.getElementById('downloadBtn');
+    const downloadBtnSidebar = document.getElementById('downloadBtnSidebar');
     const aiRemoveBgBtn = document.getElementById('aiRemoveBgBtn');
 
     let videoFile = null;
@@ -276,11 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             
-            // Show result
             frameGallery.style.display = 'none';
             previewImage.style.display = 'block';
             aiRemoveBgBtn.style.display = 'block';
             downloadBtn.style.display = 'block'; 
+            if (downloadBtnSidebar) downloadBtnSidebar.style.display = 'block';
             previewImage.src = data.spritesheet;
             
             // AI Action
@@ -307,12 +308,14 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             // Download logic
-            downloadBtn.onclick = () => {
+            const triggerDownload = () => {
                 const link = document.createElement("a");
                 link.href = previewImage.src;
                 link.download = "spritesheet.png";
                 link.click();
             };
+            downloadBtn.onclick = triggerDownload;
+            if (downloadBtnSidebar) downloadBtnSidebar.onclick = triggerDownload;
             
             // Switch tabs
             tabFrames.classList.remove('active-tab');
