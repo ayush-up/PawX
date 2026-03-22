@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const aiBgRemoval = document.getElementById('aiBgRemoval').checked;
 
         try {
-            const response = await fetch(`${API_URL}/generate-spritesheet`, {
+            const response = await fetch(`${API_URL}/create-spritesheet`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

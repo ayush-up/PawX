@@ -10,21 +10,10 @@ from backend.texture_tool.advanced_seamless import make_seamless
 from backend.texture_tool.lighting import correct_lighting
 from backend.texture_tool.pbr import generate_maps
 
+from flask_cors import CORS
+
 app = Flask(__name__)
-
-# Manual CORS setup
-@app.before_request
-def handle_preflight():
-    if request.method == "OPTIONS":
-        response = Flask.response_class()
-        return response
-
-@app.after_request
-def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-    response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
-    return response
+CORS(app) # This handles all origins and preflights automatically
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 # 50 MB max size for large base64 arrays

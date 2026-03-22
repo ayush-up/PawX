@@ -130,7 +130,7 @@ if (processBtn && !window.location.pathname.includes('spritesheet.html')) {
     processBtn.disabled = true;
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/process", {
+        const response = await fetch(`${API_URL}/process`, {
             method: "POST",
             body: formData
         });
