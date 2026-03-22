@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TexForge – Texture Tools</title>
+    <link rel="stylesheet" href="style.css?v=2">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo">
+                <img src="face icon.png" height="70px" width="70px">
+                <h1>paw<span class="dot">X</span></h1>
+                <!-- <p>GAME DEV STUDIO</p> -->
+            </div>
+        </a>
+
+        <nav class="nav-btns">
+        </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <h2>TEXTURE builder <br> FOR <span class="orange">GAME DEVS</span></h2>
+        <p class="subtext">TRANSFORM RAW TEXTURES INTO GAME‑READY ASSETS</p>
+    </section>
+
+    <!-- MAIN TOOL SECTION -->
+    <section class="tool-wrapper">
+
+        <!-- BIG UPLOAD BOX (VISIBLE FIRST) -->
+
+        <div class="big-drop" id="bigDropZone">
+            <input type="file" id="imageUpload">
+            <p>Drop texture here<br><span>or click to browse</span></p>
+        </div>
+
+        <!-- HIDDEN TOOL UI (SHOW AFTER IMAGE UPLOAD) -->
+        <div class="tool-content" id="toolContent">
+
+            <!-- LEFT PANEL -->
+            <div class="left-panel">
+                <h3>OPTIONS</h3>
+
+                <div class="options">
+
+                    <label><input type="checkbox"> Make Seamless</label>
+
+                    <h4><label><input type="checkbox" id="pbrMaster"> PBR MAPS </label></h4>
+                    <label><input type="checkbox" class="pbr-child"> Normal Map </label>
+                    <label><input type="checkbox" class="pbr-child"> Roughness </label>
+                    <label><input type="checkbox" class="pbr-child"> Height Map </label>
+                    <label><input type="checkbox" class="pbr-child"> Metallic </label>
+
+                    <h4>ENHANCEMENTS</h4>
+                    <label><input type="checkbox"> Lighting Fix</label>
+
+                    <select>
+                        <option>Resize (Pow‑2)</option>
+                        <option>1024×1024</option>
+                        <option>2048×2048</option>
+                    </select>
+
+                    <button type="button" class="process-btn">▶ PROCESS</button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right-panel">
+                <div class="preview-header">
+                    <span class="active-tab">PREVIEW</span>
+                    <span>PBR MAPS</span>
+                </div>
+
+                <div class="preview-box">
+                    <p id="previewText">No texture uploaded<br><span>Upload a texture to get started</span></p>
+                    <img id="previewImage">
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="script.js?v=5"></script>
+
+    <script src="script.js?v=5"></script>
+</body>
+
+</html>

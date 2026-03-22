@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamedev Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=2">
+</head>
+
+<body class="landing-page">
+
+    <!-- HEADER -->
+    <header class="navbar">
+        <div class="logo">
+            <img src="face icon.png" height="70px" width="70px">
+            <h1>paw<span class="dot">X</span></h1>
+            <!-- <p>GAME DEV STUDIO</p> -->
+        </div>
+
+        <nav class="nav-btns" style="flex: 1; justify-content: flex-start; margin-left: 40px;">
+            <a href="#home" class="nav-link">HOME</a>
+            <a href="#tools" class="nav-link">TOOLS</a>
+            <a href="#about" class="nav-link">FEATURES</a>
+            <a href="#contact" class="nav-link">CONTACT</a>
+        </nav>
+    </header>
+    <!-- HERO SECTION -->
+    <section class="hero-cinematic" id="home">
+        <div class="hero-overlay">
+            <h1>REVOLUTIONIZE YOUR <br> <span class="orange">GAMEDEV WORKFLOW</span></h1>
+            <p>Modern tools for textures, animations, and environment assets.</p>
+            <a href="#tools" class="cta-btn">EXPLORE TOOLKIT</a>
+        </div>
+    </section>
+
+    <!-- MAIN TOOL SECTION -->
+    <section class="tool-grid-container" id="tools">
+        <h2 class="section-title">Tools <br> FOR <span class="orange">GAME DEVS</span></h2>
+        <div class="tool-grid">
+        <a href="tex.html" class="tool-card">
+            <div class="card-img">
+                <img src="texture_thumb.png" alt="Texture Builder">
+            </div>
+            <div class="card-content">
+                <h3>TEXTURE BUILDER</h3>
+                <p>Convert images to PBR materials with seamless tiling and lighting fix.</p>
+                <span class="card-tag">3D ASSETS</span>
+            </div>
+        </a>
+
+        <a href="spritesheet.html" class="tool-card">
+            <div class="card-img">
+                <img src="spritesheet_thumb.png" alt="Spritesheet Builder">
+            </div>
+            <div class="card-content">
+                <h3>SPRITESHEET BUILDER</h3>
+                <p>Extract high-quality animation frames from AI video clips.</p>
+                <span class="card-tag">2D ANIMATION</span>
+            </div>
+        </a>
+
+        <a href="assetPack generator.html" class="tool-card">
+            <div class="card-img">
+                <img src="assetpack_thumb.png" alt="Asset Pack Generator">
+            </div>
+            <div class="card-content">
+                <h3>ASSET PACK GEN</h3>
+                <p>Point-based AI extraction for environment sprites from moodboards.</p>
+                <span class="card-tag">ENVIRONMENT</span>
+            </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION (Consolidated Pipeline & Engines) -->
+    <section class="about-section" id="about">
+        <div class="pipeline-area">
+            <h2>CORE WORKFLOW</h2>
+            <div class="pipe-grid">
+                <div class="pipe-card">TEXTURES<br><span>PBR & SEAMLESS</span></div>
+                <div class="pipe-card">ANIMATION<br><span>VIDEO TO SPRITES</span></div>
+                <div class="pipe-card">EXTRACTION<br><span>POINT-BASED</span></div>
+                <div class="pipe-card">CLEANUP<br><span>BG REMOVAL</span></div>
+                <div class="pipe-card">BATCH PROCESS<br><span>FAST EXPORT</span></div>
+            </div>
+        </div>
+
+        <div class="engine-area">
+            <h2>ENGINE SUPPORT</h2>
+            <div class="engine-btns">
+                <button>UNREAL</button>
+                <button>UNITY</button>
+                <button>GODOT</button>
+                <button>CRYENGINE</button>
+                <button class="custom">CUSTOM</button>
+            </div>
+        </div>
+    </section>
+    <!-- CONTACT SECTION -->
+    <section class="contact-section" id="contact">
+        <h2 class="section-title">GET IN <span class="orange">TOUCH</span></h2>
+        <div class="contact-card" style="text-align: center;">
+            <p style="opacity: 0.7; margin-bottom: 30px;">HAVE A QUESTION OR NEED CUSTOM TOOLS? FEEL FREE TO REACH OUT THROUGH ANY OF THESE CHANNELS.</p>
+            <div class="contact-items" style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                <div class="contact-item">
+                    <span style="color: #ff6a00; font-weight: bold; letter-spacing: 1px;">EMAIL</span>
+                    <p style="font-size: 1.2rem; margin: 5px 0;">ayushkhunt0@gmail.com</p>
+                </div>
+                <div class="contact-item">
+                    <span style="color: #ff6a00; font-weight: bold; letter-spacing: 1px;">STUDIO</span>
+                    <p style="font-size: 1.2rem; margin: 5px 0;">PAWX STUDIO, INDIA</p>
+                </div>
+            </div>
+            <div style="margin-top: 40px; display: flex; justify-content: center; gap: 30px;">
+                <a href="#" class="cta-btn" style="padding: 10px 25px; font-size: 0.8rem;">INSTAGRAM</a>
+                <a href="#" class="cta-btn" style="padding: 10px 25px; font-size: 0.8rem;">YOUTUBE</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="footer" style="padding: 40px; text-align: center; border-top: 1px solid #222; margin-top: 60px; color: #666; font-size: 0.85rem;">
+        <p>&copy; 2026 PAWX STUDIO. ALL RIGHTS RESERVED.</p>
+        <div style="margin-top: 10px; display: flex; justify-content: center; gap: 20px;">
+            <a href="#" style="color: #666; text-decoration: none;">TWITTER</a>
+            <a href="#" style="color: #666; text-decoration: none;">INSTAGRAM</a>
+            <a href="#" style="color: #666; text-decoration: none;">YOUTUBE</a>
+        </div>
+    </footer>
+
+    <script src="script.js?v=5"></script>
+</body>
+
+</html>
