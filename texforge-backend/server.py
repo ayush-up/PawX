@@ -1,16 +1,20 @@
 import os
-import cv2
-import numpy as np
-import base64
 import time
+import base64
+import numpy as np
+import cv2
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+
+# Numba Stability Fixes for experimental Python environments
+os.environ['NUMBA_CACHE_DIR'] = '/tmp/numba_cache'
+os.environ['NUMBA_PARALLEL_DIAGNOSTICS'] = '0'
 
 # Import backend logic
 from backend.texture_tool.advanced_seamless import make_seamless
 from backend.texture_tool.lighting import correct_lighting
 from backend.texture_tool.pbr import generate_maps
 
-from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app) # This handles all origins and preflights automatically
@@ -184,36 +188,37 @@ def generate_spritesheet():
         return jsonify({"error": "Empty frame list"}), 400
 
     start_time = time.time()
+    decode_start = time.time() # Initialize early to avoid NameError
     
     # Pre-load rembg session (Lite model for memory safety)
     rembg_session = None
     if remove_bg:
         try:
             from rembg import remove, new_session
-            # Optimization: Pre-importing helps with first-request timeouts
-            print("Initializing rembg (u2netp)...")
+            print("Initializing rembg engine...")
             rembg_session = new_session("u2netp")
         except Exception as e:
             print(f"rembg init error: {e}")
             remove_bg = False
 
-    print(f"[{time.time() - start_time:.2f}s] AI Model Ready. Processing {len(base64_frames)} frames.")
-    decode_start = time.time()
-
+    try:
+        print(f"[{time.time() - start_time:.2f}s] AI Model Ready. Processing {len(base64_frames)} frames.")
+    except: pass
+    
     cv_frames = []
     for i, b64 in enumerate(base64_frames):
-        b64_data = b64.split(',')[-1]
-        b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
-        
         try:
+            b64_data = b64.split(',')[-1]
+            b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
             img_bytes = base64.b64decode(b64_data)
+            
             if remove_bg and rembg_session:
-                img_bytes = remove(img_bytes, session=rembg_session)
+                from rembg import remove as rembg_inner_remove
+                img_bytes = rembg_inner_remove(img_bytes, session=rembg_session)
             
             np_arr = np.frombuffer(img_bytes, np.uint8)
             img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
             if img is not None:
-                # Standardize to BGRA (4 channels)
                 if len(img.shape) == 2: img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGRA)
                 elif img.shape[2] == 3: img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
                 cv_frames.append(img)
@@ -221,7 +226,9 @@ def generate_spritesheet():
             print(f"Frame {i} error: {e}")
             continue
 
-    print(f"[{time.time() - decode_start:.2f}s] Processing complete. Frames: {len(cv_frames)}")
+    try:
+        print(f"[{time.time() - decode_start:.2f}s] Processing complete. Frames: {len(cv_frames)}")
+    except: pass
     stitch_start = time.time()
     
     if not cv_frames:
