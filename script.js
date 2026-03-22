@@ -1,3 +1,4 @@
+const API_URL = 'https://pawx.onrender.com';
 const bigDrop = document.getElementById("bigDropZone");
 const fileInput = document.getElementById("imageUpload");
 const toolContent = document.getElementById("toolContent");
@@ -82,7 +83,7 @@ if (processBtn && !window.location.pathname.includes('spritesheet.html')) {
     processBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     // 1. Get the file
-    console.log("Process button clicked. Sending to 127.0.0.1:8000...");
+    console.log(`Process button clicked. Sending to ${API_URL}...`);
 
     // Check if file is available
     if (!currentFile && fileInput.files.length === 0) {

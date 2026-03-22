@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let extractedFramesBase64 = []; // Store original base64 images
 
     // API URL
-    const API_URL = 'http://127.0.0.1:8000';
+    const API_URL = 'https://pawx.onrender.com';
 
     // Upload Handlers
     dropZone.addEventListener('click', () => uploader.click());
