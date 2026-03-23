@@ -19,15 +19,21 @@ from backend.texture_tool.lighting import correct_lighting
 from backend.texture_tool.pbr import generate_maps
 
 
-# Global AI Engine Initialization (Saves 10s per request)
+# Global AI Session variable
 REMBG_SESSION = None
-try:
-    from rembg import new_session
-    # Lite model [u2netp] is optimized for CPU-only small-RAM servers
-    REMBG_SESSION = new_session("u2netp")
-    print("✅ AI Engine [Lite + Thread-Limited] initialized and ready.")
-except Exception as e:
-    print(f"⚠️ AI Engine warning: {e}")
+
+def get_ai_session():
+    """Lazy-load the AI session only when needed to prevent startup timeouts."""
+    global REMBG_SESSION
+    if REMBG_SESSION is None:
+        try:
+            from rembg import new_session
+            print("⏳ Lazy-loading AI Engine [Lite]...")
+            REMBG_SESSION = new_session("u2netp")
+            print("✅ AI Engine ready.")
+        except Exception as e:
+            print(f"⚠️ AI Engine warning: {e}")
+    return REMBG_SESSION
 
 app = Flask(__name__)
 CORS(app) 
@@ -203,8 +209,8 @@ def generate_spritesheet():
     start_time = time.time()
     decode_start = time.time() # Initialize early to avoid NameError
     
-    # Use Global AI Session (Pre-loaded for speed)
-    rembg_session = REMBG_SESSION if remove_bg else None
+    # Lazy-load session for speed + reliability
+    rembg_session = get_ai_session() if remove_bg else None
     
     cv_frames = []
     for i, b64 in enumerate(base64_frames):
@@ -485,8 +491,8 @@ def remove_bg_single():
     try:
         from rembg import remove
         img_bytes = base64.b64decode(b64_data)
-        # Use Global AI session!
-        out_bytes = remove(img_bytes, session=REMBG_SESSION)
+        # Use Lazy Global AI session!
+        out_bytes = remove(img_bytes, session=get_ai_session())
         
         out_b64 = f"data:image/png;base64,{base64.b64encode(out_bytes).decode('utf-8')}"
         return jsonify({"image": out_b64})
