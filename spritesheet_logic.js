@@ -119,9 +119,55 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error extracting frames. Ensure the Python backend is running.");
         } finally {
             extractBtn.innerText = "⚡ EXTRACT FRAMES";
-            extractBtn.disabled = false;
+            // User requirement: Disable extract after successful run
+            if (extractedFramesBase64.length > 0) {
+                extractBtn.disabled = true;
+            } else {
+                extractBtn.disabled = false;
+            }
         }
     });
+
+    // AI CLEAN ALL FRAMES Logic (Step 1)
+    if (aiRemoveBgBtn) {
+        aiRemoveBgBtn.addEventListener('click', async () => {
+            if (extractedFramesBase64.length === 0) return;
+
+            const originalText = aiRemoveBgBtn.innerText;
+            aiRemoveBgBtn.disabled = true;
+            
+            try {
+                for (let i = 0; i < extractedFramesBase64.length; i++) {
+                    aiRemoveBgBtn.innerText = `⏳ AI: ${i+1}/${extractedFramesBase64.length}`;
+                    
+                    const response = await fetch(`${API_URL}/remove-bg-single`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: extractedFramesBase64[i] })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.image) {
+                        extractedFramesBase64[i] = data.image; // Replace with transparent version
+                    }
+                }
+                
+                // Refresh Gallery
+                displayFramesInGallery();
+                aiRemoveBgBtn.innerText = "✨ AI CLEANING DONE";
+                setTimeout(() => {
+                    aiRemoveBgBtn.innerText = "✨ AI REMOVE BACKGROUNDS";
+                    // Keep enabled so user can re-run if they want, or disable if preferred
+                    aiRemoveBgBtn.disabled = false; 
+                }, 3000);
+                
+            } catch (err) {
+                alert("AI Error: " + err.message);
+                aiRemoveBgBtn.disabled = false;
+                aiRemoveBgBtn.innerText = originalText;
+            }
+        });
+    }
 
     // Handle "Download Individual Frames"
     if (downloadFramesBtn) {
@@ -293,29 +339,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             previewImage.src = data.spritesheet;
             
-            // AI Action
-            aiRemoveBgBtn.onclick = async () => {
-                aiRemoveBgBtn.innerText = "⏳ REMOVING...";
-                aiRemoveBgBtn.disabled = true;
-                try {
-                    const aiRes = await fetch(`${API_URL}/remove-bg-single`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ image: previewImage.src })
-                    });
-                    const aiData = await aiRes.json();
-                    if (aiData.image) {
-                        previewImage.src = aiData.image;
-                        aiRemoveBgBtn.style.display = 'none'; // Done
-                    }
-                } catch (err) {
-                    alert("AI Error: " + err.message);
-                } finally {
-                    aiRemoveBgBtn.innerText = "✨ AI REMOVE BACKGROUND";
-                    aiRemoveBgBtn.disabled = false;
-                }
-            };
-
+            // Final State: Enforce user requirements
+            if (extractBtn) extractBtn.disabled = true;
+            if (aiRemoveBgBtn) aiRemoveBgBtn.disabled = true;
+            if (generateBtn) generateBtn.disabled = true;
+            if (downloadBtnSidebar) downloadBtnSidebar.disabled = false;
+            
             // Download logic
             const triggerDownload = () => {
                 const link = document.createElement("a");
