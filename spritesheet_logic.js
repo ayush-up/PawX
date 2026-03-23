@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Sync Sidebar States
             if (generateBtn) generateBtn.disabled = false;
             if (downloadFramesBtn) downloadFramesBtn.disabled = false;
-            if (aiRemoveBgBtn) aiRemoveBgBtn.disabled = true;
+            if (aiRemoveBgBtn) aiRemoveBgBtn.disabled = false; 
             if (downloadBtnSidebar) downloadBtnSidebar.disabled = true;
             
             // Fix for CSS flex layout issue hiding the grid
