@@ -158,31 +158,37 @@ def extract_frames():
     if video_fps <= 0:
         video_fps = 30 # Fallback if FPS cannot be read
     
-    # Calculate how many frames to skip to get the desired frames per second
+    # Calculate frame skip
     frame_skip = max(1, int(video_fps / fps_extract_rate))
-
-    frames_b64 = []
-    frame_count = 0
-    success, image = cap.read()
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     
-    while success:
-        if frame_count % frame_skip == 0:
-            # Resize frame to save memory (e.g., max 512px height)
-            h, w = image.shape[:2]
-            if h > 512:
-                ratio = 512.0 / h
-                new_w = int(w * ratio)
-                image = cv2.resize(image, (new_w, 512))
-                
-            _, buf = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 80])
-            b64_str = f"data:image/jpeg;base64,{base64.b64encode(buf).decode('utf-8')}"
-            frames_b64.append(b64_str)
-            
+    frames_b64 = []
+    
+    # Process frames by seeking (much faster than reading sequentially)
+    for f_idx in range(0, total_frames, frame_skip):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, f_idx)
         success, image = cap.read()
-        frame_count += 1
+        if not success:
+            break
+            
+        # Resize frame to save memory (e.g., max 512px height)
+        h, w = image.shape[:2]
+        if h > 512:
+            ratio = 512.0 / h
+            new_w = int(w * ratio)
+            image = cv2.resize(image, (new_w, 512))
+            
+        _, buf = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 80])
+        b64_str = f"data:image/jpeg;base64,{base64.b64encode(buf).decode('utf-8')}"
+        frames_b64.append(b64_str)
         
-        # Hard limit to prevent memory crash on very long videos
-        if len(frames_b64) > 200:
+        # Cleanup
+        del image
+        if len(frames_b64) % 10 == 0:
+            gc.collect()
+
+        # Hard limit to prevent memory crash
+        if len(frames_b64) >= 100:
             break
 
     cap.release()
