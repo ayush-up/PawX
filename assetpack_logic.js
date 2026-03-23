@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const frameGallery = document.getElementById('frameGallery');
     
     const extractBtn = document.getElementById('extractBtn');
+    const aiRemoveBgBtn = document.getElementById('aiRemoveBgBtn');
     const clearPointsBtn = document.getElementById('clearPointsBtn');
     const pointCountDisplay = document.getElementById('pointCount');
     const downloadFramesBtn = document.getElementById('downloadFramesBtn');
@@ -140,12 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
         extractBtn.innerText = "⏳ EXTRACTING...";
         extractBtn.disabled = true;
 
-        const aiBgRemoval = document.getElementById('aiBgRemoval') ? document.getElementById('aiBgRemoval').checked : true;
-
         const formData = new FormData();
         formData.append('image', imageFile);
         formData.append('points', JSON.stringify(points));
-        formData.append('remove_bg', aiBgRemoval);
+        formData.append('remove_bg', false); // Always false for the main extraction
 
         try {
             const response = await fetch(`${API_URL}/extract-sprites-points`, {
@@ -163,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Switch UI state
             canvasContainer.style.display = 'none';
             frameGallery.style.display = 'grid';
+            if (aiRemoveBgBtn) aiRemoveBgBtn.disabled = false;
             downloadFramesBtn.style.display = 'block';
             downloadFramesBtn.disabled = false;
             
@@ -177,6 +177,46 @@ document.addEventListener('DOMContentLoaded', () => {
             extractBtn.disabled = false;
         }
     });
+
+    // AI Background Removal Action
+    if (aiRemoveBgBtn) {
+        aiRemoveBgBtn.addEventListener('click', async () => {
+            if (extractedSpritesBase64.length === 0) return;
+            
+            aiRemoveBgBtn.innerText = "⏳ REMOVING...";
+            aiRemoveBgBtn.disabled = true;
+            
+            try {
+                for (let i = 0; i < extractedSpritesBase64.length; i++) {
+                    aiRemoveBgBtn.innerText = `⏳ AI: ${i+1}/${extractedSpritesBase64.length}`;
+                    
+                    const response = await fetch(`${API_URL}/remove-bg-single`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: extractedSpritesBase64[i] })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.image) {
+                        extractedSpritesBase64[i] = data.image;
+                    }
+                }
+                
+                // Refresh Gallery
+                displaySpritesInGallery();
+                aiRemoveBgBtn.innerText = "✨ AI REMOVAL DONE";
+                setTimeout(() => {
+                    aiRemoveBgBtn.innerText = "✨ AI REMOVE BACKGROUNDS";
+                    aiRemoveBgBtn.disabled = false;
+                }, 3000);
+                
+            } catch (err) {
+                alert("AI Error: " + err.message);
+                aiRemoveBgBtn.innerText = "✨ AI REMOVE BACKGROUNDS";
+                aiRemoveBgBtn.disabled = false;
+            }
+        });
+    }
 
     function displaySpritesInGallery() {
         frameGallery.innerHTML = ''; // Clear old
