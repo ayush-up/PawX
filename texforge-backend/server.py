@@ -158,20 +158,23 @@ def extract_frames():
     if video_fps <= 0:
         video_fps = 30 # Fallback if FPS cannot be read
     
-    # Calculate frame skip
+    # Robust Frame Extraction Logic
     frame_skip = max(1, int(video_fps / fps_extract_rate))
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    
     frames_b64 = []
+    current_frame = 0
+    extracted_count = 0
     
-    # Process frames by seeking (much faster than reading sequentially)
-    for f_idx in range(0, total_frames, frame_skip):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, f_idx)
+    while True:
+        # Seek logic (try fast seek, but sequential read is safer if seek fails)
+        if frame_skip > 1:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, current_frame)
+            
         success, image = cap.read()
         if not success:
             break
             
-        # Resize frame to save memory (e.g., max 512px height)
+        # Process every Nth frame
+        # Resize frame to save memory (max 512px height)
         h, w = image.shape[:2]
         if h > 512:
             ratio = 512.0 / h
@@ -181,14 +184,22 @@ def extract_frames():
         _, buf = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 80])
         b64_str = f"data:image/jpeg;base64,{base64.b64encode(buf).decode('utf-8')}"
         frames_b64.append(b64_str)
+        extracted_count += 1
         
-        # Cleanup
+        # Cleanup immediately
         del image
-        if len(frames_b64) % 10 == 0:
+        if extracted_count % 10 == 0:
             gc.collect()
 
-        # Hard limit to prevent memory crash
-        if len(frames_b64) >= 100:
+        # Update counter
+        current_frame += frame_skip
+        
+        # Stability Limits
+        if extracted_count >= 80: # Reduced limit for reliability
+            break
+            
+        # Hard safety breaker for infinite loops
+        if current_frame > 50000: # Max 50,000 frames (~30 mins at 30fps)
             break
 
     cap.release()

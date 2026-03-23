@@ -85,11 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('video', videoFile);
         formData.append('fps_rate', fpsRate);
 
+        // v=20: Added timeout for better UI stability
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
         try {
             const response = await fetch(`${API_URL}/extract-frames`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             if (!response.ok) throw new Error("API Error");
 
