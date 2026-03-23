@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateBtn = document.getElementById('generateBtn');
     const tabFrames = document.getElementById('tabFrames');
     const tabResult = document.getElementById('tabResult');
-    const downloadBtn = document.getElementById('downloadBtn');
     const downloadBtnSidebar = document.getElementById('downloadBtnSidebar');
     const aiRemoveBgBtn = document.getElementById('aiRemoveBgBtn');
 
@@ -258,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
         generateBtn.disabled = true;
 
         const gridLayout = document.getElementById('gridLayout').value;
-        const aiBgRemoval = document.getElementById('aiBgRemoval').checked;
 
         try {
             const response = await fetch(`${API_URL}/generate-spritesheet`, {
@@ -277,11 +275,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             
+            // Show result
             frameGallery.style.display = 'none';
             previewImage.style.display = 'block';
-            aiRemoveBgBtn.style.display = 'block';
-            downloadBtn.style.display = 'block'; 
-            if (downloadBtnSidebar) downloadBtnSidebar.style.display = 'block';
+            
+            // Enable Sidebar Action Buttons
+            if (aiRemoveBgBtn) aiRemoveBgBtn.disabled = false;
+            if (downloadBtnSidebar) downloadBtnSidebar.disabled = false;
+            
             previewImage.src = data.spritesheet;
             
             // AI Action
@@ -314,7 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.download = "spritesheet.png";
                 link.click();
             };
-            downloadBtn.onclick = triggerDownload;
             if (downloadBtnSidebar) downloadBtnSidebar.onclick = triggerDownload;
             
             // Switch tabs
