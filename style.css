@@ -556,4 +556,10 @@ body {
     box-shadow: 0 0 10px rgba(255, 106, 0, 0.1);
 }
 
-
+/* Global Disabled States for Step-by-Step UI */
+button:disabled {
+    opacity: 0.4 !important;
+    filter: grayscale(100%) !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
