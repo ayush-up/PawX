@@ -176,10 +176,11 @@ def extract_frames():
         # Process every Nth frame
         # Resize frame to save memory (max 512px height)
         h, w = image.shape[:2]
-        if h > 512:
-            ratio = 512.0 / h
+        # High-RAM Optimization (HF Spaces)
+        if h > 1024:
+            ratio = 1024.0 / h
             new_w = int(w * ratio)
-            image = cv2.resize(image, (new_w, 512))
+            image = cv2.resize(image, (new_w, 1024))
             
         _, buf = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 80])
         b64_str = f"data:image/jpeg;base64,{base64.b64encode(buf).decode('utf-8')}"
@@ -516,12 +517,12 @@ def remove_bg_single():
         if img is None:
             return jsonify({"error": "Could not decode image"}), 500
             
-        # AGGRESSIVE RESIZE for RAM LIMIT (384px is plenty for sprites)
+        # High-RAM Optimization (HF Spaces: 1024px is now safe)
         h, w = img.shape[:2]
-        if h > 384:
-            ratio = 384.0 / h
+        if h > 1024:
+            ratio = 1024.0 / h
             new_w = int(w * ratio)
-            img = cv2.resize(img, (new_w, 384))
+            img = cv2.resize(img, (new_w, 1024))
         
         # Convert back to bytes for rembg
         _, img_buf = cv2.imencode('.png', img)
