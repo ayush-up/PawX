@@ -498,20 +498,40 @@ def extract_sprites_points():
 @app.route('/remove-bg-single', methods=['POST'])
 
 def remove_bg_single():
+    # Force Cleanup before AI
+    gc.collect()
+    
     data = request.json
     if not data or 'image' not in data:
         return jsonify({"error": "No image provided"}), 400
         
-    b64_data = data['image'].split(',')[-1]
-    b64_data += "=" * ((4 - len(b64_data) % 4) % 4)
-    
     try:
         from rembg import remove
-        img_bytes = base64.b64decode(b64_data)
-        # Use Lazy Global AI session!
-        out_bytes = remove(img_bytes, session=get_ai_session())
         
-        out_b64 = f"data:image/png;base64,{base64.b64encode(out_bytes).decode('utf-8')}"
+        # Decode
+        b64_data = data['image'].split(',')[-1]
+        img_bytes = np.frombuffer(base64.b64decode(b64_data), np.uint8)
+        img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
+        
+        if img is None:
+            return jsonify({"error": "Could not decode image"}), 500
+            
+        # AGGRESSIVE RESIZE for RAM LIMIT (384px is plenty for sprites)
+        h, w = img.shape[:2]
+        if h > 384:
+            ratio = 384.0 / h
+            new_w = int(w * ratio)
+            img = cv2.resize(img, (new_w, 384))
+        
+        # Convert back to bytes for rembg
+        _, img_buf = cv2.imencode('.png', img)
+        processed_bytes = remove(img_buf.tobytes(), session=get_ai_session())
+        
+        # Cleanup
+        del img
+        gc.collect()
+        
+        out_b64 = f"data:image/png;base64,{base64.b64encode(processed_bytes).decode('utf-8')}"
         return jsonify({"image": out_b64})
     except Exception as e:
         print(f"rembg error: {e}")

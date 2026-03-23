@@ -146,6 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let i = 0; i < extractedFramesBase64.length; i++) {
                     aiRemoveBgBtn.innerText = `⏳ AI: ${i+1}/${extractedFramesBase64.length}`;
                     
+                    // Delay to prevent server OOM (Render Free Tier stability)
+                    await new Promise(resolve => setTimeout(resolve, 800));
+
                     const response = await fetch(`${API_URL}/remove-bg-single`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
