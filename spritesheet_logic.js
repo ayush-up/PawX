@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabResult = document.getElementById('tabResult');
     const downloadBtnSidebar = document.getElementById('downloadBtnSidebar');
     const aiRemoveBgBtn = document.getElementById('aiRemoveBgBtn');
+    const downloadFramesBtn = document.getElementById('downloadFramesBtn');
+
+    // INITIAL STATE: Everything action-oriented is disabled until video is processed
+    if (extractBtn) extractBtn.disabled = true;
+    if (generateBtn) generateBtn.disabled = true;
+    if (aiRemoveBgBtn) aiRemoveBgBtn.disabled = true;
+    if (downloadBtnSidebar) downloadBtnSidebar.disabled = true;
+    if (downloadFramesBtn) downloadFramesBtn.disabled = true;
 
     let videoFile = null;
     let extractedFramesBase64 = []; // Store original base64 images
@@ -51,11 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
             previewText.style.display = 'none';
             frameGallery.style.display = 'none';
             previewImage.style.display = 'none';
-            downloadBtn.style.display = 'none';
             
             // Show Video
             previewVideo.style.display = 'block';
             previewVideo.src = URL.createObjectURL(file);
+            
+            // Enable Extraction
+            if (extractBtn) extractBtn.disabled = false;
         } else {
             alert('Please upload a valid video file.');
         }
@@ -91,16 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Switch UI state
             previewVideo.style.display = 'none';
             frameGallery.style.display = 'grid';
-            downloadBtn.style.display = 'none';
+            
+            // Sync Sidebar States
+            if (generateBtn) generateBtn.disabled = false;
+            if (downloadFramesBtn) downloadFramesBtn.disabled = false;
+            if (aiRemoveBgBtn) aiRemoveBgBtn.disabled = true;
+            if (downloadBtnSidebar) downloadBtnSidebar.disabled = true;
             
             // Fix for CSS flex layout issue hiding the grid
             document.getElementById('previewContainer').style.display = 'block'; 
-            
-            generateBtn.disabled = false;
-            
-            // Enable Download Frames btn
-            const downloadFramesBtn = document.getElementById('downloadFramesBtn');
-            if (downloadFramesBtn) downloadFramesBtn.disabled = false;
             
             tabFrames.classList.add('active-tab');
             tabResult.classList.remove('active-tab');
@@ -115,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Handle "Download Individual Frames"
-    const downloadFramesBtn = document.getElementById('downloadFramesBtn');
     if (downloadFramesBtn) {
         downloadFramesBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -335,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (extractedFramesBase64.length > 0) {
             frameGallery.style.display = 'grid';
             previewImage.style.display = 'none';
-            downloadBtn.style.display = 'none';
             document.getElementById('previewContainer').style.display = 'block';
             tabFrames.classList.add('active-tab');
             tabResult.classList.remove('active-tab');
@@ -346,7 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (previewImage.src && previewImage.src !== window.location.href) {
             frameGallery.style.display = 'none';
             previewImage.style.display = 'block';
-            downloadBtn.style.display = 'block';
             document.getElementById('previewContainer').style.display = 'flex';
             tabFrames.classList.remove('active-tab');
             tabResult.classList.add('active-tab');
