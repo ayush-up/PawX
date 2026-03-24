@@ -49,7 +49,7 @@ class PBRGenerator:
         roughness = self._generate_roughness(height_f)
         
         # 5. Metallic Map
-        metallic = self._generate_metallic(height_f, self.metallic_type)
+        metallic = self._generate_metallic(height_f, img_f, self.metallic_type)
         
         return {
             "normal": normal_map,
@@ -149,7 +149,7 @@ class PBRGenerator:
         # Output
         return (roughness * 255).astype(np.uint8)
 
-    def _generate_metallic(self, height_f, mode):
+    def _generate_metallic(self, height_f, img_f, mode):
         """
         Generates metallic map based on mode.
         """
@@ -178,8 +178,29 @@ class PBRGenerator:
             metallic[mask] = 255
             return metallic
             
-        else: # non_metal
-            return np.zeros((h, w), dtype=np.uint8)
+        else: # auto / composite / non_metal (improved default)
+            # Procedural heuristic: Bright + Desaturated = Metal
+            # Convert to HSV for better analysis
+            # img_f is BGR [0, 1]
+            hsv = cv2.cvtColor(img_f, cv2.COLOR_BGR2HSV)
+            
+            # saturation is hsv[:,:,1], value is hsv[:,:,2]
+            # hsv in opencv [0-180, 0-255, 0-255] for uint8, but for float it's [0-360, 0-1, 0-1]
+            # Actually cvtColor on float32 usually gives [0-360, 0-1, 0-1]
+            s = hsv[:, :, 1]
+            v = hsv[:, :, 2]
+            
+            # Heuristic: metal = (Value * (1.0 - Saturation))^3
+            # We use cube to sharpen the contrast (only very bright/clean areas)
+            metal_score = (v * (1.0 - s)) ** 3
+            
+            # Scale to 255
+            metallic = (metal_score * 255).astype(np.uint8)
+            
+            # Apply a slight threshold to keep blacks black
+            _, metallic = cv2.threshold(metallic, 40, 0, cv2.THRESH_TOZERO)
+            
+            return metallic
 
 def generate_maps(img, base_name="output"):
     """

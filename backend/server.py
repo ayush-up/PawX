@@ -19,8 +19,24 @@ from backend.texture_tool.lighting import correct_lighting
 from backend.texture_tool.pbr import generate_maps
 
 
-# Global AI Session variable
+# Global AI Session variables
 REMBG_SESSION = None
+FASTSAM_SESSION = None
+
+def get_fastsam_session():
+    """Lazy-load FastSAM model only when needed."""
+    global FASTSAM_SESSION
+    if FASTSAM_SESSION is None:
+        try:
+            from ultralytics import FastSAM
+            import os
+            os.environ['YOLO_VERBOSE'] = 'False'
+            print("⏳ Loading FastSAM Logic...")
+            FASTSAM_SESSION = FastSAM("FastSAM-s.pt")
+            print("✅ FastSAM ready.")
+        except Exception as e:
+            print(f"⚠️ FastSAM load error: {e}")
+    return FASTSAM_SESSION
 
 def get_ai_session():
     """Lazy-load the AI session only when needed to prevent startup timeouts."""
@@ -45,6 +61,10 @@ UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'outputs'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+@app.route('/')
+def home():
+    return jsonify({"status": "online", "message": "pawDevX Studio API is running on Hugging Face 16GB!"})
 
 @app.route('/outputs/<path:filename>')
 def serve_output(filename):
@@ -361,17 +381,8 @@ def extract_sprites_points():
         return jsonify({"error": "Failed to decode image"}), 400
     
     # Check if we can use FastSAM
-    use_fastsam = False
-    model = None
-    try:
-        import os
-        from ultralytics import FastSAM
-        # Suppress ultralytics logging by setting YOLO_VERBOSE
-        os.environ['YOLO_VERBOSE'] = 'False'
-        model = FastSAM("FastSAM-s.pt")
-        use_fastsam = True
-    except Exception as e:
-        print(f"FastSAM unavailable: {e}. Falling back to OpenCV.")
+    model = get_fastsam_session()
+    use_fastsam = model is not None
         
     extracted_sprites = []
     
