@@ -146,11 +146,16 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('points', JSON.stringify(points));
         formData.append('remove_bg', false); // Always false for the main extraction
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s for model loading
+
         try {
             const response = await fetch(`${API_URL}/extract-sprites-points`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             if (!response.ok) throw new Error("API Error");
 
