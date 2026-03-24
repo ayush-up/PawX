@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let extractedSpritesBase64 = [];
 
     // API URL
-    const API_URL = 'https://pawx.onrender.com';
+    const API_URL = 'https://ayushup2135-pawx-backend.hf.space';
 
     // Upload Handlers
     dropZone.addEventListener('click', () => uploader.click());

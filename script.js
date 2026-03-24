@@ -1,4 +1,4 @@
-const API_URL = 'https://pawx.onrender.com';
+const API_URL = 'https://ayushup2135-pawx-backend.hf.space';
 const bigDrop = document.getElementById("bigDropZone");
 const fileInput = document.getElementById("imageUpload");
 const toolContent = document.getElementById("toolContent");

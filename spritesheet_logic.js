@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let extractedFramesBase64 = []; // Store original base64 images
 
     // API URL
-    const API_URL = 'https://pawx.onrender.com';
+    const API_URL = 'https://ayushup2135-pawx-backend.hf.space';
 
     // Upload Handlers
     dropZone.addEventListener('click', () => uploader.click());
