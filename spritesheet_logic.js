@@ -137,41 +137,55 @@ document.addEventListener('DOMContentLoaded', () => {
     // AI CLEAN ALL FRAMES Logic (Step 1)
     if (aiRemoveBgBtn) {
         aiRemoveBgBtn.addEventListener('click', async () => {
-            if (extractedFramesBase64.length === 0) return;
+            const wrappers = frameGallery.querySelectorAll('.frame-wrapper');
+            const selectedWrappers = Array.from(wrappers).filter(w => w.dataset.selected === "true");
+            
+            if (selectedWrappers.length === 0) {
+                alert("Please select frames to clean first!");
+                return;
+            }
 
             const originalText = aiRemoveBgBtn.innerText;
             aiRemoveBgBtn.disabled = true;
             
             try {
-                for (let i = 0; i < extractedFramesBase64.length; i++) {
-                    aiRemoveBgBtn.innerText = `⏳ AI: ${i+1}/${extractedFramesBase64.length}`;
+                for (let i = 0; i < selectedWrappers.length; i++) {
+                    const wrap = selectedWrappers[i];
+                    const idx = parseInt(wrap.dataset.index);
                     
-                    // Delay to prevent server OOM (Render Free Tier stability)
+                    aiRemoveBgBtn.innerText = `⏳ AI: ${i+1}/${selectedWrappers.length}`;
+                    
+                    // Delay to prevent server OOM (Render/HF stability)
                     await new Promise(resolve => setTimeout(resolve, 800));
 
                     const response = await fetch(`${API_URL}/remove-bg-single`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ image: extractedFramesBase64[i] })
+                        body: JSON.stringify({ image: extractedFramesBase64[idx] })
                     });
                     
+                    if (!response.ok) {
+                        console.error(`AI Error on frame ${idx}:`, await response.text());
+                        continue; // Skip failed frame
+                    }
+
                     const data = await response.json();
                     if (data.image) {
-                        extractedFramesBase64[i] = data.image; // Replace with transparent version
+                        extractedFramesBase64[idx] = data.image; // Replace with transparent version
+                        // Live update the gallery image
+                        const galleryImg = wrap.querySelector('img');
+                        if (galleryImg) galleryImg.src = data.image;
                     }
                 }
                 
-                // Refresh Gallery
-                displayFramesInGallery();
                 aiRemoveBgBtn.innerText = "✨ AI CLEANING DONE";
                 setTimeout(() => {
                     aiRemoveBgBtn.innerText = "✨ AI REMOVE BACKGROUNDS";
-                    // Keep enabled so user can re-run if they want, or disable if preferred
                     aiRemoveBgBtn.disabled = false; 
                 }, 3000);
                 
             } catch (err) {
-                alert("AI Error: " + err.message);
+                alert("AI Connection Error: " + err.message);
                 aiRemoveBgBtn.disabled = false;
                 aiRemoveBgBtn.innerText = originalText;
             }
