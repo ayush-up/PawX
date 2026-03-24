@@ -1,15 +1,16 @@
-html {
-    scroll-behavior: smooth;
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+    font-family: 'Press Start 2P', cursive !important;
 }
 
 body {
     margin: 0;
     background: #080808;
     color: #eee;
-    font-family: 'Press Start 2P', cursive, sans-serif !important;
     overflow-x: hidden;
     line-height: 1.8;
-    font-size: 10px; /* Force smaller base for Press Start 2P */
+    font-size: 10px;
 }
 .tool-card {
     background: rgba(255, 255, 255, 0.03);
