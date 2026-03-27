@@ -243,14 +243,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     folder.file(filename, base64Data, {base64: true});
                 });
 
-                // Generate async blob
-                const content = await zip.generateAsync({type:"blob"});
+                // Generate async blob with explicit MIME type
+                const content = await zip.generateAsync({
+                    type: "blob",
+                    mimeType: "application/zip"
+                });
                 
                 // Trigger download
                 const link = document.createElement("a");
-                link.href = URL.createObjectURL(content);
+                const url = URL.createObjectURL(content);
+                link.href = url;
                 link.download = "extracted_frames.zip";
+                
+                // Append to body (required for some browsers to trigger download properly)
+                document.body.appendChild(link);
                 link.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
             } catch (error) {
                 console.error("Error zipping files:", error);
                 alert("There was an error generating the ZIP file.");

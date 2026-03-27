@@ -351,12 +351,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     folder.file(filename, base64Data, {base64: true});
                 });
 
-                const content = await zip.generateAsync({type:"blob"});
+                const content = await zip.generateAsync({
+                    type: "blob",
+                    mimeType: "application/zip"
+                });
                 
                 const link = document.createElement("a");
-                link.href = URL.createObjectURL(content);
+                const url = URL.createObjectURL(content);
+                link.href = url;
                 link.download = "extracted_sprites.zip";
+                
+                document.body.appendChild(link);
                 link.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
             } catch (error) {
                 console.error("Error zipping files:", error);
                 alert("There was an error generating the ZIP file.");
