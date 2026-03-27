@@ -35,22 +35,42 @@ class PBRGenerator:
         self.metallic_type = self.params.get('metallic_type', 'non_metal') # non_metal, metal, composite
 
     def process(self, img):
-        # 1. Pre-process (Float32)
-        img_f = img.astype(np.float32) / 255.0
+        # 1. Pre-process (Downscale if too large for speed)
+        original_h, original_w = img.shape[:2]
+        target_size = 1024
         
-        # 2. Height Map (Advanced Frequency Separation)
+        if max(original_h, original_w) > target_size:
+            scale = target_size / max(original_h, original_w)
+            img_small = cv2.resize(img, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+        else:
+            img_small = img
+            
+        img_f = img_small.astype(np.float32) / 255.0
+        
+        # 2. Height Map (Prerequisite for others)
         height_f = self._generate_height(img_f)
+        
+        # 3. Parallel Map Generation
+        from concurrent.futures import ThreadPoolExecutor
+        
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            future_normal = executor.submit(self._generate_normal, height_f)
+            future_roughness = executor.submit(self._generate_roughness, height_f)
+            future_metallic = executor.submit(self._generate_metallic, height_f, img_f, self.metallic_type)
+            
+            normal_map = future_normal.result()
+            roughness = future_roughness.result()
+            metallic = future_metallic.result()
+            
+        # 4. Final Upscale back to original if needed
         height = (height_f * 255).astype(np.uint8)
         
-        # 3. Normal Map
-        normal_map = self._generate_normal(height_f)
-        
-        # 4. Roughness Map
-        roughness = self._generate_roughness(height_f)
-        
-        # 5. Metallic Map
-        metallic = self._generate_metallic(height_f, img_f, self.metallic_type)
-        
+        if max(original_h, original_w) > target_size:
+            normal_map = cv2.resize(normal_map, (original_w, original_h), interpolation=cv2.INTER_LINEAR)
+            roughness = cv2.resize(roughness, (original_w, original_h), interpolation=cv2.INTER_LINEAR)
+            height = cv2.resize(height, (original_w, original_h), interpolation=cv2.INTER_LINEAR)
+            metallic = cv2.resize(metallic, (original_w, original_h), interpolation=cv2.INTER_LINEAR)
+            
         return {
             "normal": normal_map,
             "roughness": roughness,

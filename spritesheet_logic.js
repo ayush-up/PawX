@@ -97,7 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             clearTimeout(timeoutId);
 
-            if (!response.ok) throw new Error("API Error");
+            if (!response.ok) {
+                if (response.status === 503 || response.status === 504 || response.status === 502) {
+                    throw new Error("SERVER_WARMUP");
+                }
+                throw new Error("API_ERROR");
+            }
 
             const data = await response.json();
             extractedFramesBase64 = data.frames;
@@ -121,8 +126,14 @@ document.addEventListener('DOMContentLoaded', () => {
             tabResult.classList.remove('active-tab');
 
         } catch (error) {
-            console.error(error);
-            alert("Error extracting frames. Ensure the Python backend is running.");
+            clearTimeout(timeoutId);
+            console.error("Extraction error:", error);
+            
+            if (error.name === 'AbortError' || error.message === "SERVER_WARMUP") {
+                alert("🚀 BACKEND IS WARMING UP! \n\nSince this is the first run, the AI model is loading on the server. \n\nPLEASE WAIT 30 SECONDS AND TRY AGAIN!");
+            } else {
+                alert("Error extracting frames. Ensure the Python backend is running.");
+            }
         } finally {
             extractBtn.innerText = "⚡ EXTRACT FRAMES";
             // User requirement: Disable extract after successful run

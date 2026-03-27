@@ -157,7 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             clearTimeout(timeoutId);
 
-            if (!response.ok) throw new Error("API Error");
+            if (!response.ok) {
+                if (response.status === 503 || response.status === 504 || response.status === 502) {
+                    throw new Error("SERVER_WARMUP");
+                }
+                throw new Error("API_ERROR");
+            }
 
             const data = await response.json();
             extractedSpritesBase64 = data.sprites;
@@ -175,8 +180,14 @@ document.addEventListener('DOMContentLoaded', () => {
             tabResult.classList.add('active-tab');
 
         } catch (error) {
-            console.error(error);
-            alert("Error extracting sprites. Ensure the Python backend is running.");
+            clearTimeout(timeoutId);
+            console.error("Extraction error:", error);
+            
+            if (error.name === 'AbortError' || error.message === "SERVER_WARMUP") {
+                alert("🚀 BACKEND IS WARMING UP! \n\nThis tool uses a heavy AI model. Since this is the first run, it's taking a moment to start. \n\nPLEASE WAIT 30 SECONDS AND TRY AGAIN!");
+            } else {
+                alert("Error extracting sprites. Ensure the Python backend is running.");
+            }
         } finally {
             extractBtn.innerText = "▶ EXTRACT SPRITES";
             extractBtn.disabled = false;
