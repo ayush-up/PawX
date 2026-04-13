@@ -8,8 +8,8 @@
     // === CONFIG ===
     const MAX_TILT = 8;               // Max rotation in degrees
     const PERSPECTIVE = 1000;          // CSS perspective value (px)
-    const TRANSITION_SPEED = '0.1s';   // Smoothing on mouse move
-    const RESET_SPEED = '0.5s';        // Smoothing on mouse leave (spring back)
+    const TRANSITION_SPEED = '0.03s';   // Snappy, almost instantaneous mouse tracking
+    const RESET_SPEED = '0.25s';        // Fast, tight spring back to flat
     const GLARE_ENABLED = true;        // Subtle light glare following mouse
     const GLARE_OPACITY = 0.08;        // Max glare brightness
 
