@@ -15,58 +15,82 @@ def convert_markdown_to_docx(input_md, output_docx):
     with open(input_md, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
+    # Define Academic Styles
+    style = doc.styles['Normal']
+    font = style.font
+    font.name = 'Calibri'
+    font.size = Pt(11)
+
     for line in lines:
         line = line.strip()
         
-        # Handle Headings
+        # Chapter Headings (Giant center titles to hit page count)
         if line.startswith('# '):
+            if any(key in line for key in ["Chapter", "Report", "CERTIFICATE", "ABSTRACT", "ACKNOWLEDGEMENT", "SUMMARY", "TABLE OF CONTENTS", "LIST OF"]):
+                doc.add_page_break()
+            
             h = doc.add_heading(line[2:], level=0)
             h.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            # Force large size for chapters
+            run = h.runs[0]
+            run.font.size = Pt(26)
+            run.bold = True
+
         elif line.startswith('## '):
-            doc.add_heading(line[3:], level=1)
+            h = doc.add_heading(line[3:], level=1)
+            run = h.runs[0]
+            run.font.size = Pt(18)
+            
         elif line.startswith('### '):
             doc.add_heading(line[4:], level=2)
-        elif line.startswith('#### '):
-            doc.add_heading(line[5:], level=3)
             
-        # Handle Horizontal Rules
+        # Horizontal Rules (Page break)
         elif line == '---':
             doc.add_page_break()
             
-        # Handle Lists
+        # Lists
         elif line.startswith('* ') or line.startswith('- '):
-            doc.add_paragraph(line[2:], style='List Bullet')
-        elif re.match(r'^\d+\.', line):
-            # Numeric lists
-            content = re.sub(r'^\d+\.\s+', '', line)
-            doc.add_paragraph(content, style='List Number')
-            
-        # Handle Tables (Simpler representation)
+            p = doc.add_paragraph(line[2:], style='List Bullet')
+            p.paragraph_format.line_spacing = 1.15
+
+        # Tables
         elif '|' in line:
-            if '---' in line: continue # Skip separator lines
+            if '---' in line: continue
             cells = [c.strip() for c in line.split('|') if c.strip()]
             if not cells: continue
             
-            # For simplicity in this script, we'll just add it as a tabbed paragraph
-            # A full table conversion is complex, but this keeps the data readable
-            doc.add_paragraph("\t".join(cells))
-            
-        # Handle Bold/Italic (Simple regex)
+            p = doc.add_paragraph("\t".join(cells))
+            p.paragraph_format.line_spacing = 1.5
+            p.style = 'Quote' # Uses a distinct style for tables
+
+        # Placeholder boxes
+        elif '[FIGURE' in line or '[PLACEHOLDER' in line:
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = p.add_run(f"\n\n--- {line} ---\n\n")
+            run.bold = True
+            run.font.size = Pt(12)
+            run.italic = True
+
+        # Body Text
         elif line:
-            # Clean Bold markers for the paragraph
             clean_line = re.sub(r'\*\*(.*?)\*\*', r'\1', line)
             p = doc.add_paragraph(clean_line)
+            p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY  # Set Justify Alignment
+            p.paragraph_format.line_spacing = 1.5
+            p.paragraph_format.space_after = Pt(12) # Academic paragraph gap
             
-            # If it was a sub-header style (No leading # but all caps or bold)
             if line.startswith('**') and line.endswith('**'):
-                p.style = 'Heading 3'
+                run = p.runs[0]
+                run.bold = True
+                run.font.size = Pt(14)
 
     doc.save(output_docx)
     print(f"Successfully converted {input_md} to {output_docx}")
 
 if __name__ == "__main__":
-    # Paths for the artifacts directory (Adjust if needed)
-    input_file = r"C:\Users\ayush\.gemini\antigravity\brain\73afa305-48cf-4fc8-bfce-c62c19b77149\Academic_Project_Report.md"
-    output_file = r"n:\projects\project\sem6\pawX\PawDevX_Academic_Report.docx"
+    # Path to the report I just generated
+    input_file = r"Academic_Project_Report.md"
+    output_file = r"PawDevX_Industrial_Training_Report.docx"
     
     convert_markdown_to_docx(input_file, output_file)
