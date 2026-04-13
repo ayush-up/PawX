@@ -177,15 +177,34 @@ body {
 }
 
 /* HERO CINEMATIC - Used in Landing Page */
+@keyframes scrollPawPattern {
+    0% { background-position: 0 0; }
+    100% { background-position: 400px -400px; }
+}
+
 .hero-cinematic {
     height: 100vh;
-    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('hero_bg.png') no-repeat center center/cover;
+    background-color: #050505;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     position: relative;
     margin-top: -70px; /* Pull up behind navbar */
+    overflow: hidden;
+}
+
+.hero-cinematic::after {
+    content: '';
+    position: absolute;
+    top: -50px; left: -50px;
+    right: -50px; bottom: -50px; /* Bleed edge for parallax */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ff6a00' fill-opacity='0.04' transform='translate(50,50) rotate(-15 50 50)'%3E%3Ccircle cx='20' cy='35' r='12' /%3E%3Ccircle cx='40' cy='15' r='12' /%3E%3Ccircle cx='60' cy='15' r='12' /%3E%3Ccircle cx='80' cy='35' r='12' /%3E%3Cpath d='M 50,40 C 70,40 90,55 85,80 C 80,105 20,105 15,80 C 10,55 30,40 50,40 Z' /%3E%3C/g%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    animation: scrollPawPattern 40s linear infinite;
+    z-index: -2;
+    transition: transform 0.1s ease-out;
+    transform: translate(var(--px, 0), var(--py, 0));
 }
 
 .hero-overlay {

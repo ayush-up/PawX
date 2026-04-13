@@ -135,6 +135,19 @@
     <script src="script.js?v=201"></script>
     <script src="dither-bg.js?v=1"></script>
     <script src="target-cursor.js?v=1"></script>
+    <script src="tilt-effect.js?v=1"></script>
+    <script>
+        // Parallax background logic for Hero Cinematic
+        const cinematic = document.querySelector('.hero-cinematic');
+        if (cinematic) {
+            document.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth - 0.5) * 40; 
+                const y = (e.clientY / window.innerHeight - 0.5) * 40;
+                cinematic.style.setProperty('--px', `${x}px`);
+                cinematic.style.setProperty('--py', `${y}px`);
+            });
+        }
+    </script>
 </body>
 
 </html>

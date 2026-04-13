@@ -13,7 +13,7 @@
     const GLARE_ENABLED = true;        // Subtle light glare following mouse
     const GLARE_OPACITY = 0.08;        // Max glare brightness
 
-    const SELECTORS = '.big-drop';
+    const SELECTORS = '.big-drop, .hero-overlay';
 
     function initTilt(el) {
         // Set base styles
