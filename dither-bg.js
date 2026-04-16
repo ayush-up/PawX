@@ -7,21 +7,21 @@
  */
 (function () {
     // === CONFIG ===
-    const PIXEL_SIZE = 1;               // Size of each dither dot (smaller = finer)
-    const NOISE_SCALE = 0.0025;         // Scale of the noise (smaller = larger shapes)
-    const ANIM_SPEED = 0.0005;           // Animation speed (visible flow)
-    const FLOW_ANGLE = Math.PI * 0.75;  // Flow direction: bottom-left to top-right
+    const PIXEL_SIZE = 5;               // Size of each dither dot (smaller = finer)
+    const NOISE_SCALE = 0.0027;         // Scale of the noise (smaller = larger shapes)
+    const ANIM_SPEED = 0.005;           // Animation speed (visible flow)
+    const FLOW_ANGLE = Math.PI * 1.5;  // Flow direction: bottom-left to top-right
     const FLOW_DX = Math.cos(FLOW_ANGLE);
     const FLOW_DY = Math.sin(FLOW_ANGLE);
     const MOUSE_RADIUS = 130;           // Mouse clear zone radius
     const MOUSE_FADE_EDGE = 70;         // Soft edge fade
-    const NOISE_COLOR_R = 255;          // White
-    const NOISE_COLOR_G = 255;
-    const NOISE_COLOR_B = 255;
+    const NOISE_COLOR_R = 69;          // White
+    const NOISE_COLOR_G = 47;
+    const NOISE_COLOR_B = 32;
     const BRIGHTNESS = 0.28;            // Overall brightness (0–1, subtle)
     const CONTRAST = 1.6;               // Contrast multiplier
     const OCTAVES = 3;                  // Noise layers (more = more detail)
-    const PERSISTENCE = 0.01;            // How much each octave contributes
+    const PERSISTENCE = 0.001;            // How much each octave contributes
     const WARP_STRENGTH = 0.8;          // Domain warp intensity (fluid look)
     const CANVAS_SCALE = 0.5;           // Render at half res for performance
     const FPS_CAP = 30;
