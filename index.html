@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=202">
+    <link rel="stylesheet" href="css/style.css?v=300">
 </head>
 
 <body class="landing-page">
@@ -16,7 +16,7 @@
     <!-- HEADER -->
     <header class="navbar">
         <div class="logo">
-            <img src="face icon.png" height="70px" width="70px">
+            <img src="images/logo/face-icon.png" height="70px" width="70px">
             <h1>pawDev<span class="dot">X</span></h1>
             <!-- <p>GAME DEV STUDIO</p> -->
         </div>
@@ -26,6 +26,7 @@
             <a href="#tools" class="nav-link">TOOLS</a>
             <a href="#about" class="nav-link">FEATURES</a>
             <a href="#contact" class="nav-link">CONTACT</a>
+            <a href="#" id="about-btn" class="nav-link" style="color: #ff6a00;">ABOUT US</a>
         </nav>
     </header>
     <!-- HERO SECTION -->
@@ -41,9 +42,9 @@
     <section class="tool-grid-container" id="tools">
         <h2 class="section-title">Tools <br> FOR <span class="orange">GAME DEVS</span></h2>
         <div class="tool-grid">
-        <a href="tex.html" class="tool-card">
+        <a href="pages/tex.html" class="tool-card">
             <div class="card-img">
-                <img src="texture_thumb.png" alt="Texture Builder">
+                <img src="images/thumbnails/texture_builder.png" alt="Texture Builder">
             </div>
             <div class="card-content">
                 <h3>TEXTURE BUILDER</h3>
@@ -52,9 +53,9 @@
             </div>
         </a>
 
-        <a href="spritesheet.html" class="tool-card">
+        <a href="pages/spritesheet.html" class="tool-card">
             <div class="card-img">
-                <img src="spritesheet_thumb.png" alt="Spritesheet Builder">
+                <img src="images/thumbnails/spritesheet_builder.png" alt="Spritesheet Builder">
             </div>
             <div class="card-content">
                 <h3>SPRITESHEET BUILDER</h3>
@@ -63,9 +64,9 @@
             </div>
         </a>
 
-        <a href="assetPack generator.html" class="tool-card">
+        <a href="pages/assetPack-generator.html" class="tool-card">
             <div class="card-img">
-                <img src="assetpack_thumb.png" alt="Asset Pack Generator">
+                <img src="images/thumbnails/assetpack_gen.png" alt="Asset Pack Generator">
             </div>
             <div class="card-content">
                 <h3>ASSET PACK GEN</h3>
@@ -132,10 +133,10 @@
         </div>
     </footer>
 
-    <script src="script.js?v=201"></script>
-    <script src="dither-bg.js?v=1"></script>
-    <script src="target-cursor.js?v=1"></script>
-    <script src="tilt-effect.js?v=1"></script>
+    <script src="js/script.js?v=201"></script>
+    <script src="js/dither-bg.js?v=1"></script>
+    <script src="js/target-cursor.js?v=1"></script>
+    <script src="js/tilt-effect.js?v=1"></script>
     <script>
         // Parallax background logic for Hero Cinematic
         const cinematic = document.querySelector('.hero-cinematic');
@@ -148,6 +149,71 @@
             });
         }
     </script>
+
+
+    <!-- ABOUT iCARDS SYSTEM -->
+    <div class="hanger-wrapper" id="hanger-wrapper-1" style="left: 30%; transform: translateX(-50%);">
+        <svg class="string-svg">
+            <defs>
+                <pattern id="lanyardTex1" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="2" height="4" fill="rgba(0,0,0,0.15)"/>
+                    <rect x="2" width="2" height="4" fill="transparent"/>
+                </pattern>
+            </defs>
+            <path class="lanyard-bg" fill="none" stroke="#ff6a00" stroke-width="24" stroke-linecap="square" />
+            <path class="lanyard-path" fill="none" stroke="url(#lanyardTex1)" stroke-width="24" stroke-linecap="square" />
+            <path class="lanyard-edges" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="24" stroke-linecap="square" style="filter: drop-shadow(inset 0 0 2px black);" />
+        </svg>
+
+        <div class="icard">
+            <div class="metal-clip"></div>
+            <div class="punch-hole"></div>
+            <div class="profile-img">
+                <img src="images/icards/ayush-khunt-psp.png" alt="Ayush Khunt">
+            </div>
+            <h2>Ayush Khunt</h2>
+            <h4>Backend Developer</h4>
+            
+            <div class="details">
+                <p style="margin:0;"><strong>ID CODE:</strong> 404-NO-SLEEP</p>
+                <p style="margin:0;"><strong>STATUS:</strong> CERTIFIED CYBER CRIMINAL</p>
+                <p style="margin:0;"><strong>PERSONALITY:</strong> BOLD WITH SANS SERIF</p>
+                <p style="margin:0;"><strong>WORKING ON:</strong> HACKING NASA (JUST KIDDING OR MAY NOT)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="hanger-wrapper" id="hanger-wrapper-2" style="left: 70%; transform: translateX(-50%);">
+        <svg class="string-svg">
+            <defs>
+                <pattern id="lanyardTex2" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="2" height="4" fill="rgba(0,0,0,0.15)"/>
+                    <rect x="2" width="2" height="4" fill="transparent"/>
+                </pattern>
+            </defs>
+            <path class="lanyard-bg" fill="none" stroke="#ff6a00" stroke-width="24" stroke-linecap="square" />
+            <path class="lanyard-path" fill="none" stroke="url(#lanyardTex2)" stroke-width="24" stroke-linecap="square" />
+            <path class="lanyard-edges" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="24" stroke-linecap="square" style="filter: drop-shadow(inset 0 0 2px black);" />
+        </svg>
+
+        <div class="icard">
+            <div class="metal-clip"></div>
+            <div class="punch-hole"></div>
+            <div class="profile-img">
+                <img src="images/icards/khushbu-patel-psp.png" alt="Khushbu Patel">
+            </div>
+            <h2>Khushbu Patel</h2>
+            <h4>Frontend Developer</h4>
+            
+            <div class="details">
+                <p style="margin:0;"><strong>ID CODE:</strong> 200-ALL-DONE</p>
+                <p style="margin:0;"><strong>STATUS:</strong> Sleeping & still better than him</p>
+                <p style="margin:0;"><strong>PERSONALITY:</strong> What did you expect? Normie energy</p>
+                <p style="margin:0;"><strong>WORKING ON:</strong> Undoing his code</p>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

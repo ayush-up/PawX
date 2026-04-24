@@ -631,3 +631,116 @@ input[type="checkbox"]:checked {
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
 }
+
+/* =========================================
+   HANGING iCARD DROPDOWN PHYSICS OVERLAYS
+   ========================================= */
+.hanger-wrapper {
+    position: fixed;
+    top: -800px;
+    transition: top 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.hanger-wrapper.dropped {
+    top: -60px; /* Anchor perfectly off-frame so string comes from screen edge */
+}
+
+/* Lanyard SVG bounds */
+.string-svg {
+    position: absolute;
+    top: 0;
+    left: -500px;
+    width: 1000px;
+    height: 1000px;
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible;
+}
+
+.icard {
+    width: 225px;
+    height: auto;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 106, 0, 0.4);
+    border-radius: 14px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,106,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 15px 20px;
+    cursor: grab;
+    user-select: none;
+    position: absolute;
+    left: -112.5px;
+    top: 0;
+    z-index: 2;
+    box-sizing: border-box;
+    transition: box-shadow 0.3s;
+    transform-origin: top center;
+}
+
+.icard:hover {
+    box-shadow: 0 30px 70px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,106,0,0.15);
+    border-color: rgba(255, 106, 0, 0.6);
+}
+.icard:active { cursor: grabbing; }
+
+.punch-hole {
+    width: 35px;
+    height: 8px;
+    background: #000;
+    border-radius: 8px;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,1);
+    border: 1px solid #222;
+}
+
+.metal-clip {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 22px;
+    background: linear-gradient(to right, #888, #eee, #555);
+    border-radius: 4px;
+    border: 1px solid #333;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.8);
+    z-index: 3;
+}
+
+.icard .profile-img {
+    width: 50px;
+    height: 70px;
+    border-radius: 8px;
+    background: #111;
+    border: 2px solid #ff6a00;
+    margin-bottom: 15px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.icard .profile-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.icard h2 { font-family: 'Press Start 2P', cursive; font-size: 0.9rem; color: #ff6a00; margin: 0 0 8px 0; }
+.icard h4 { margin: 0; font-weight: normal; font-size: 0.7rem; color: #fff; padding-bottom: 10px; border-bottom: 1px dashed rgba(255, 106, 0, 0.3); width: 100%; text-align: center; }
+.icard .details { width: 100%; padding: 10px 0; font-size: 0.6rem; color: #aaa; text-align: left; line-height: 1.8; }
+.icard strong { color: #ccc; }
+
+.icard .barcode {
+    margin-top: auto;
+    width: 100%;
+    height: 30px;
+    background: repeating-linear-gradient(90deg, #fff, #fff 2px, #000 2px, #000 4px, #fff 4px, #fff 5px, #000 5px, #000 8px, #fff 8px, #fff 10px, #000 10px, #000 12px);
+    opacity: 0.9;
+    border-radius: 4px;
+}
+.icard .logo-small { font-size: 0.5rem; color: #666; margin-top: 10px; font-weight: bold; letter-spacing: 2px; }
+

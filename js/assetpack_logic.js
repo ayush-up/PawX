@@ -1,6 +1,6 @@
 // Logic for Asset Pack Generator tool
 document.addEventListener('DOMContentLoaded', () => {
-    const isAssetPackPage = window.location.pathname.includes('assetPack%20generator.html') || window.location.pathname.includes('assetPack generator.html');
+    const isAssetPackPage = window.location.pathname.includes('assetPack-generator.html') || window.location.pathname.includes('assetPack%20generator.html') || window.location.pathname.includes('assetPack generator.html');
     if (!isAssetPackPage) return; // Only run on asset pack page
 
     const dropZone = document.getElementById('imageDropZone');
